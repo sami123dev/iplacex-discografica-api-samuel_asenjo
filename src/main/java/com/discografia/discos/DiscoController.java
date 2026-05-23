@@ -19,25 +19,54 @@ public class DiscoController {
     @Autowired
     private IArtistaRepository artistaRepository;
 
-    @PostMapping(value = "/disco", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Disco> HandlePostDiscoRequest(@RequestBody Disco disco) {
-        return ResponseEntity.ok(discoRepository.save(disco));
+    @PostMapping(
+            value = "/disco",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> HandlePostDiscoRequest(@RequestBody Disco disco) {
+
+        if (!artistaRepository.existsById(disco.idArtista)) {
+
+            return ResponseEntity.badRequest()
+                    .body("El artista especificado no existe");
+        }
+
+        return ResponseEntity.ok(
+                discoRepository.save(disco)
+        );
     }
 
-    @GetMapping(value = "/discos", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(
+            value = "/discos",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<List<Disco>> HandleGetDiscosRequest() {
-        return ResponseEntity.ok(discoRepository.findAll());
+
+        return ResponseEntity.ok(
+                discoRepository.findAll()
+        );
     }
 
-    @GetMapping(value = "/disco/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(
+            value = "/disco/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<?> HandleGetDiscoRequest(@PathVariable String id) {
+
         return discoRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping(value = "/artista/{id}/discos", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(
+            value = "/artista/{id}/discos",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<List<Disco>> HandleGetDiscosByArtistaRequest(@PathVariable String id) {
-        return ResponseEntity.ok(discoRepository.findDiscosByIdArtista(id));
+
+        return ResponseEntity.ok(
+                discoRepository.findDiscosByIdArtista(id)
+        );
     }
 }
